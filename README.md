@@ -7,8 +7,8 @@ e envia tudo pronto para o app da portaria.
 
 - [x] **Fase 1 — Base**: servidor + login (Google e e-mail/senha = data do casamento)
 - [x] **Fase 2 — Portal**: meus eventos + lista + personalizar site (logo, cores, letras)
-- [ ] **Fase 3 — RSVP**: página do convidado (nome de cada pessoa, adulto/criança)
-- [ ] **Fase 4 — Ponte**: puxar lista no app da portaria (+ código manual)
+- [x] **Fase 3 — RSVP**: página do convidado (nome de cada pessoa, adulto/criança) — ⚠️ rode `supabase/migration-fase3.sql` 1 vez
+- [x] **Fase 4 — Ponte**: puxar lista no app da portaria (código + CSV) — ⚠️ rode `supabase/migration-fase4.sql` 1 vez
 - [ ] **Fase 5 — Impressão**: pulseiras e encartes personalizados
 - [ ] **Fase 6 — Refino**: testes e ajustes
 

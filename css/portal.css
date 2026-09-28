@@ -130,3 +130,31 @@ input,select,textarea{font-size:16px}
 .x{margin-left:auto;border:none;background:#f9edea;width:32px;height:32px;border-radius:10px;font-size:16px;line-height:1;cursor:pointer}
 .modal-f .btn{flex:1;justify-content:center}
 @media(max-width:640px){.modal-bg{padding:0;align-items:flex-end}.modal{border-radius:22px 22px 0 0;max-height:94vh}}
+/* ===== Fase 3 (RSVP) ===== */
+.linkrow{display:flex;gap:8px}
+.linkrow input{flex:1;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;font-size:13px;min-width:0;background:#fdf6f4}
+.qrrow{display:flex;gap:14px;margin-top:12px;align-items:flex-start}
+#rsvp-qr{background:#fff;padding:8px;border:1px solid var(--line);border-radius:12px;flex:none}
+#rsvp-qr img{display:block}
+@media(max-width:420px){.qrrow{flex-direction:column}}
+.famcard{border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px;background:#fffdfb}
+.famcard b{font-size:16px}
+.famcard .muted{margin:4px 0 0}
+.tog{display:flex;background:#f4dfe3;border-radius:12px;padding:4px;gap:2px;min-width:170px;flex:none}
+.tog button{flex:1;border:none;background:transparent;padding:9px 10px;border-radius:9px;font:inherit;font-weight:700;font-size:13.5px;color:var(--muted);cursor:pointer}
+.tog button.on-vai{background:var(--ok);color:#fff}
+.tog button.on-nao{background:#fff;color:var(--ink);box-shadow:0 3px 12px rgba(28,30,70,.08)}
+.prow{display:flex;gap:8px;align-items:center;border-top:1px solid var(--line);padding:10px 0}
+.prow:first-child{border-top:none}
+.pmain{flex:1;min-width:0}
+.pmain b{font-size:15px;display:block}
+.vagas{font-weight:700;font-size:14px;color:var(--pri)}
+.stepdot{display:flex;gap:6px;justify-content:center;margin-bottom:12px}
+.stepdot i{width:26px;height:6px;border-radius:99px;background:var(--line)}
+.stepdot i.on{background:var(--pri)}
+.success-big{font-size:52px;text-align:center}
+.addrow{display:flex;gap:8px}
+.addrow input[type=text]{flex:1;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;font-size:14px;min-width:0}
+@media(max-width:420px){.prow{flex-wrap:wrap}.tog{flex:1}}
+/* ===== Fase 4 (ponte assessoria) ===== */
+.orgcode{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:34px;font-weight:800;letter-spacing:6px;text-align:center;background:#fdf6f4;border:2px dashed var(--pri);border-radius:14px;padding:12px;margin:10px 0}

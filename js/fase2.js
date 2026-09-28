@@ -1,4 +1,4 @@
-// Portal do Casal — Fase 2: eventos, lista, personalização
+// Portal do Casal — Fase 2: eventos, lista, personalização (+ RSVP F3 + assessoria F4)
 import * as DB from "./db.js";
 import { toast, show, openModal, closeModal, esc, fmtDateBR, busy } from "./ui.js";
 
@@ -343,7 +343,7 @@ function renderTema() {
     <button class="btn btn-pri btn-block" id="btn-save-tema" onclick="P2.saveTema()">💾 Salvar personalização</button>
   </div>
   <div class="card"><h3>👀 Prévia do site</h3><div id="tema-preview"></div>
-  <p class="hint">É assim que o convidado verá a página de confirmação (Fase 3).</p></div>`;
+  <p class="hint">É assim que o convidado verá a página de confirmação.</p></div>`;
   previewTema();
 }
 function themeVals() {
@@ -395,7 +395,112 @@ async function saveTema() {
   busy("#btn-save-tema", false);
 }
 
-// ================= ABA PAINEL =================
+// ================= ABA PAINEL + RSVP + ASSESSORIA =================
+function rsvpBase() {
+  return location.origin + location.pathname.replace(/[^/]*$/, "");
+}
+function rsvpLink() {
+  return rsvpBase() + "rsvp.html?c=" + (CUR.rsvp_code || "");
+}
+function rsvpCardHTML() {
+  const link = rsvpLink();
+  const wa = "https://wa.me/?text=" + encodeURIComponent(`💒 Confirme sua presença no nosso casamento: ${link}`);
+  const open = CUR.rsvp_open !== false;
+  return `<div class="card"><h3>💌 Convites / Link do RSVP</h3>
+    <p class="muted">Envie este link no WhatsApp. Quem abrir confirma a presença (lista fechada: só quem está na lista).</p>
+    <div class="linkrow"><input id="rsvp-link" readonly value="${esc(link)}" onclick="this.select()"><button class="btn btn-sm btn-pri" onclick="P2.copyRsvpLink()">Copiar</button></div>
+    <div class="rowbtns" style="margin-top:8px"><a class="btn btn-sm" target="_blank" rel="noopener" href="${wa}">📲 Enviar no WhatsApp</a><a class="btn btn-sm" target="_blank" rel="noopener" href="${esc(link)}">🔗 Abrir link</a></div>
+    <div class="qrrow"><div id="rsvp-qr"></div><div style="flex:1;min-width:0">
+      <p class="muted" style="margin:0 0 6px">QR do convite:</p>
+      <div class="rowbtns"><button class="btn btn-sm" onclick="P2.toggleRsvp()">${open ? "🟢 Abertas — pausar" : "🔴 Pausadas — retomar"}</button><button class="btn btn-sm" onclick="P2.regenRsvpCode()">🎲 Novo código</button></div>
+      <p class="hint">📅 Data limite: <b>${CUR.rsvp_deadline ? fmtDateBR(CUR.rsvp_deadline) : "não definida (em ✏️ Editar)"}</b></p>
+    </div></div>
+  </div>`;
+}
+function drawRsvpQr() {
+  const el = document.getElementById("rsvp-qr");
+  if (!el) return;
+  try {
+    if (typeof QRCode === "undefined") { el.innerHTML = '<div class="hint">QR indisponível off-line</div>'; return; }
+    el.innerHTML = "";
+    new QRCode(el, { text: rsvpLink(), width: 132, height: 132, correctLevel: QRCode.CorrectLevel.M });
+  } catch (e) { el.innerHTML = ""; }
+}
+async function copyRsvpLink() {
+  const t = rsvpLink();
+  try { await navigator.clipboard.writeText(t); toast("Link copiado! 💌", "ok"); }
+  catch (_) {
+    const i = document.getElementById("rsvp-link");
+    if (i) { i.select(); try { document.execCommand("copy"); toast("Link copiado! 💌", "ok"); } catch (e) { toast("Selecione e copie o link", "bad"); } }
+  }
+}
+async function toggleRsvp() {
+  try {
+    CUR = await DB.saveEvent({ id: CUR.id, rsvp_open: !(CUR.rsvp_open !== false) });
+    const i = EVENTS.findIndex((e) => e.id === CUR.id);
+    if (i >= 0) EVENTS[i] = CUR;
+    renderPainel();
+    toast(CUR.rsvp_open ? "Confirmações abertas 🟢" : "Confirmações pausadas 🔴", "ok");
+  } catch (e) { toast(e.message || e, "bad"); }
+}
+async function regenRsvpCode() {
+  if (!confirm("Gerar um novo código? O link antigo para de funcionar.")) return;
+  const chars = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+  let code = "";
+  for (let i = 0; i < 8; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  try {
+    CUR = await DB.saveEvent({ id: CUR.id, rsvp_code: code });
+    const i = EVENTS.findIndex((e) => e.id === CUR.id);
+    if (i >= 0) EVENTS[i] = CUR;
+    renderPainel();
+    toast("Novo link gerado 🎲", "ok");
+  } catch (e) { toast(e.message || e, "bad"); }
+}
+// ---------- assessoria: código + CSV (Fase 4) ----------
+function orgCardHTML() {
+  const wa = "https://wa.me/?text=" + encodeURIComponent(`📷 Código da assessoria do nosso casamento (${CUR.title}): *${CUR.org_code}* — digite no app da portaria em "☁️ Do portal".`);
+  return `<div class="card"><h3>📷 Enviar para assessoria</h3>
+    <p class="muted">Passe este código para a cerimonialista puxar a lista pronta (confirmados + mesas):</p>
+    <div class="orgcode">${esc(CUR.org_code || "—")}</div>
+    <div class="rowbtns"><button class="btn btn-sm btn-pri" onclick="P2.copyOrgCode()">Copiar código</button><a class="btn btn-sm" target="_blank" rel="noopener" href="${wa}">📲 Mandar no WhatsApp</a><button class="btn btn-sm" onclick="P2.regenOrgCode()">🎲 Novo código</button></div>
+    <p class="hint">Sem internet na hora? <a href="#" onclick="event.preventDefault();P2.exportCSV()"><b>Baixe o CSV</b></a> e envie o arquivo — a portaria importa igual.</p>
+  </div>`;
+}
+async function copyOrgCode() {
+  const t = CUR.org_code || "";
+  if (!t) return;
+  try { await navigator.clipboard.writeText(t); toast("Código copiado! 📷", "ok"); }
+  catch (_) { toast("Código: " + t); }
+}
+async function regenOrgCode() {
+  if (!confirm("Gerar um novo código? O antigo para de funcionar.")) return;
+  const chars = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+  let code = "";
+  for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  try {
+    CUR = await DB.saveEvent({ id: CUR.id, org_code: code });
+    const i = EVENTS.findIndex((e) => e.id === CUR.id);
+    if (i >= 0) EVENTS[i] = CUR;
+    renderPainel();
+    toast("Novo código gerado 🎲", "ok");
+  } catch (e) { toast(e.message || e, "bad"); }
+}
+function exportCSV() {
+  const rows = GUESTS.filter((g) => (g.rsvp_status || "pending") !== "declined");
+  if (!rows.length) { toast("Lista vazia", "bad"); return; }
+  const q = (v) => { v = String(v ?? ""); return /[;"\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+  const cat = (g) => (g.is_child ? "👶 Criança" + (g.family_key ? ` • ${g.family_key}` : "") : (g.family_key || ""));
+  const lines = ["nome;telefone;categoria;mesa"].concat(
+    rows.map((g) => [q(g.name), q(g.phone || ""), q(cat(g)), q(g.table_no || "")].join(";")));
+  const blob = new Blob(["\uFEFF" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "lista-" + String(CUR.title || "evento").toLowerCase().replace(/[^\w]+/g, "-") + ".csv";
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  const conf = rows.filter((g) => g.rsvp_status === "confirmed").length;
+  toast(`CSV baixado: ${conf} confirmado(s) + ${rows.length - conf} pendente(s) ⬇`, "ok");
+}
 function renderPainel() {
   const total = GUESTS.length;
   const conf = GUESTS.filter((g) => g.rsvp_status === "confirmed").length;
@@ -403,6 +508,8 @@ function renderPainel() {
   const kids = GUESTS.filter((g) => g.is_child).length;
   const fams = new Set(GUESTS.map((g) => g.family_key || ("~" + g.name))).size;
   document.getElementById("ev-body").innerHTML = `
+  ${rsvpCardHTML()}
+  ${orgCardHTML()}
   <div class="stats">
     <div class="card stat"><b>${total}</b><small>pessoas</small></div>
     <div class="card stat"><b>${fams}</b><small>famílias/convites</small></div>
@@ -410,11 +517,8 @@ function renderPainel() {
     <div class="card stat"><b style="color:var(--ok)">${conf}</b><small>confirmados</small></div>
     <div class="card stat"><b style="color:var(--warn)">${total - conf - decl}</b><small>pendentes</small></div>
     <div class="card stat"><b style="color:var(--bad)">${decl}</b><small>recusaram</small></div>
-  </div>
-  <div class="card"><h3>💌 Convites (Fase 3)</h3>
-    <p class="muted">O link de confirmação aparece aqui na próxima fase. Por enquanto, monte a lista na aba 📋 Lista.</p>
-    <p class="hint">📅 Data limite do RSVP: <b>${CUR.rsvp_deadline ? fmtDateBR(CUR.rsvp_deadline) : "não definida (em ✏️ Editar)"}</b></p>
   </div>`;
+  drawRsvpQr();
 }
 
 // ---------- ações globais (onclick) ----------
@@ -422,4 +526,6 @@ window.P2 = {
   openEvents, openEvent, dlgEvent, saveEvent, delEvent, delEventGo,
   setTab, saveGuest, editGuest, delGuest, cancelEdit, renderGuestRows,
   importCSVGo, applyPreset, previewTema, saveTema,
+  copyRsvpLink, toggleRsvp, regenRsvpCode,
+  copyOrgCode, regenOrgCode, exportCSV,
 };
