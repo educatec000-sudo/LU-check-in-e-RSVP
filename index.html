@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Portal do Casal 💒 — Lu Cerimonialista</title>
+<link rel="stylesheet" href="css/portal.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="brand">
+    <div class="logo">💒</div>
+    <div><b>Portal do Casal</b><small>por Lu Cerimonialista</small></div>
+  </header>
+
+  <!-- ============ LOGIN ============ -->
+  <section id="view-login">
+    <div class="card">
+      <h2>Bem-vindo(a)! 💍</h2>
+      <p class="muted">Gerencie sua lista e confirmações em um só lugar.</p>
+      <div id="cfg-warn" class="warn" hidden>⚠️ Servidor não configurado ainda.<br>Veja o arquivo <b>COMO-CRIAR-O-SERVIDOR.md</b></div>
+      <button id="btn-google" class="btn btn-google btn-block"><span class="g">G</span> Continuar com Google</button>
+      <div class="div"><span>ou</span></div>
+      <label class="field">E-mail
+        <input id="li-email" type="email" placeholder="voce@email.com" autocomplete="email">
+      </label>
+      <label class="field">Senha
+        <input id="li-pass" type="password" placeholder="Inicial: data do casamento" autocomplete="current-password">
+      </label>
+      <div id="login-err" class="err" hidden></div>
+      <button id="btn-login" class="btn btn-pri btn-block">Entrar</button>
+      <p class="center">Primeira vez aqui? <a href="#" id="go-signup"><b>Criar conta</b></a></p>
+    </div>
+  </section>
+
+  <!-- ============ CRIAR CONTA ============ -->
+  <section id="view-signup" hidden>
+    <div class="card">
+      <h2>Criar conta 💒</h2>
+      <p class="muted">Leva menos de 1 minuto.</p>
+      <label class="field">Nome do casal
+        <input id="su-name" placeholder="Ana & João" autocomplete="name">
+      </label>
+      <label class="field">E-mail
+        <input id="su-email" type="email" placeholder="voce@email.com" autocomplete="email">
+      </label>
+      <label class="field">Data do casamento
+        <input id="su-date" type="date">
+      </label>
+      <p class="hint">🔑 Sua senha será a <b>data do casamento</b> (ex: 20122026).<br>Você pode trocar depois, se quiser.</p>
+      <div id="signup-err" class="err" hidden></div>
+      <div id="signup-ok" class="ok" hidden></div>
+      <button id="btn-signup" class="btn btn-pri btn-block">Criar minha conta</button>
+      <p class="center"><a href="#" id="go-login">← Voltar para entrar</a></p>
+    </div>
+  </section>
+
+  <!-- ============ PAINEL (logado) ============ -->
+  <section id="view-app" hidden>
+    <div class="topbar">
+      <div class="user">💒 <b id="user-name">Casal</b></div>
+      <button id="btn-logout" class="btn btn-sm">Sair</button>
+    </div>
+    <div class="card">
+      <h2>Olá, <span id="user-name2">casal</span>! 🎉</h2>
+      <p class="muted">Monte seu evento, personalize o site e acompanhe tudo por aqui.</p>
+      <div class="status"><span class="dot"></span> Conectado ao servidor</div>
+    </div>
+    <div class="grid">
+      <div class="card link" id="card-events"><b>📋 Meus eventos</b><small>Abrir →</small></div>
+      <div class="card soon"><b>💌 Link do RSVP</b><small>Fase 3 — em breve</small></div>
+      <div class="card soon"><b>📷 Enviar p/ portaria</b><small>Fase 4 — em breve</small></div>
+      <div class="card soon"><b>🖨️ Pulseiras e encartes</b><small>Fase 5 — em breve</small></div>
+    </div>
+    <div class="card">
+      <h3>🔑 Trocar senha</h3>
+      <label class="field">Nova senha
+        <input id="np-pass" type="password" placeholder="Mínimo 6 caracteres">
+      </label>
+      <div id="pass-msg" class="hint" hidden></div>
+      <button id="btn-pass" class="btn btn-block">Salvar nova senha</button>
+    </div>
+  </section>
+
+  <!-- ============ FASE 2: MEUS EVENTOS ============ -->
+  <section id="view-events" hidden>
+    <a class="back" href="#" id="back-dash">← Painel</a>
+    <div class="sec-top"><h2>💒 Meus eventos</h2><button class="btn btn-pri btn-sm" onclick="P2.dlgEvent()">＋ Novo</button></div>
+    <div id="events-list"></div>
+  </section>
+
+  <!-- ============ FASE 2: DETALHE DO EVENTO ============ -->
+  <section id="view-event" hidden>
+    <div class="card ev-head" id="ev-head"></div>
+    <div class="tabs" id="ev-tabs"></div>
+    <div id="ev-body"></div>
+  </section>
+
+  <footer class="footer">Feito com 🌸 para a Lu Cerimonialista</footer>
+</div>
+<div id="modal-root"></div>
+<div id="toast-root"></div>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
